@@ -18,8 +18,8 @@ services:
     container_name: n8n
     depends_on:
       - postgres
-    ports:
-      - "${N8N_PORT:-5678}:5678"
+    expose:
+      - "5678"
     environment:
       - GENERIC_TIMEZONE=${GENERIC_TIMEZONE}
       - TZ=${TZ}
@@ -27,7 +27,7 @@ services:
       - N8N_RUNNERS_ENABLED=true
       - N8N_HOST=0.0.0.0
       - N8N_PORT=5678
-      - WEBHOOK_URL=${WEBHOOK_URL:-http://localhost:5678}
+      - WEBHOOK_URL=${WEBHOOK_URL}
       - N8N_LOG_LEVEL=${N8N_LOG_LEVEL:-info}
       - N8N_SECURE_COOKIE=${N8N_SECURE_COOKIE:-false}
       - DB_TYPE=postgresdb
@@ -37,7 +37,7 @@ services:
       - DB_POSTGRESDB_USER=${DB_POSTGRESDB_USER}
       - DB_POSTGRESDB_SCHEMA=${DB_POSTGRESDB_SCHEMA}
       - DB_POSTGRESDB_PASSWORD=${DB_POSTGRESDB_PASSWORD}
-      # N8N_ENCRYPTION_KEY can be set for portability
+      - N8N_ENCRYPTION_KEY=${N8N_ENCRYPTION_KEY}
     volumes:
       - n8n_data:/home/node/.n8n
     networks:
@@ -45,9 +45,42 @@ services:
     restart: unless-stopped
 
 
+  nginx:
+    image: nginx:1.25-alpine
+    container_name: n8n-nginx
+    depends_on:
+      - n8n
+    ports:
+      - "80:80"
+      - "443:443"
+    volumes:
+      - ./nginx-conf:/etc/nginx/conf.d
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    networks:
+      - n8n_net
+    restart: unless-stopped
+
+
+  certbot:
+    image: certbot/certbot:latest
+    container_name: n8n-certbot
+    depends_on:
+      - nginx
+    volumes:
+      - certbot-etc:/etc/letsencrypt
+      - certbot-var:/var/lib/letsencrypt
+      - web-root:/var/www/html
+    command: certonly --webroot --webroot-path=/var/www/html --email ${SSL_EMAIL} --agree-tos --no-eff-email ${CERTBOT_STAGING} -d ${DOMAIN_NAME}
+
+
 volumes:
   n8n_data:
   pg_data:
+  certbot-etc:
+  certbot-var:
+  web-root:
 
 
 networks:

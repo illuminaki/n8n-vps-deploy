@@ -34,6 +34,10 @@ backup/
 ssl/
 certs/
 
+# Nginx configuration backups
+nginx-conf/*.bak
+nginx-conf/n8n-ssl.conf
+
 # Temporary files
 tmp/
 temp/

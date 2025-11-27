@@ -178,6 +178,31 @@ df -h
 docker compose logs --tail=100 n8n | grep -i error
 ```
 
+## Configuración SSL/HTTPS
+
+Este proyecto incluye Nginx y Certbot para SSL automático con Let's Encrypt.
+
+### Configuración Rápida SSL
+
+```bash
+# 1. Configurar dominio en .env
+DOMAIN_NAME=n8n.tudominio.com
+SSL_EMAIL=tu-email@ejemplo.com
+
+# 2. Ejecutar script de configuración
+./ssl-setup.sh
+```
+
+**[SSL-SETUP.md](./SSL-SETUP.md)** - Guía completa de configuración SSL
+
+### Arquitectura con SSL
+
+```
+Internet → Nginx (80/443) → n8n (5678) → PostgreSQL
+           ↓
+       Certbot (SSL)
+```
+
 ## Deployment en VPS
 
 Para desplegar n8n en un servidor VPS de Hetzner (o cualquier otro proveedor), consulta la guía completa:
@@ -271,12 +296,18 @@ docker compose logs -f n8n
 
 ```
 n8n-vps-deploy/
-├── docker-compose.yml    # Configuración de servicios
-├── .env.example          # Plantilla de variables de entorno
-├── .env                  # Variables de entorno (no versionado)
-├── .gitignore           # Archivos ignorados por git
-├── README.md            # Este archivo
-└── DEPLOYMENT.md        # Guía de deployment en VPS
+├── docker-compose.yml           # Configuración de servicios (n8n, PostgreSQL, Nginx, Certbot)
+├── .env.example                 # Plantilla de variables de entorno
+├── .env                         # Variables de entorno (no versionado)
+├── .gitignore                   # Archivos ignorados por git
+├── nginx-conf/
+│   ├── n8n.conf                # Configuración inicial de Nginx
+│   └── n8n-ssl.conf.example    # Configuración con SSL (template)
+├── ssl-setup.sh                 # Script automático para configurar SSL
+├── ssl-renew.sh                 # Script para renovar certificados
+├── README.md                    # Este archivo
+├── SSL-SETUP.md                 # Guía completa de configuración SSL
+└── DEPLOYMENT.md                # Guía de deployment en VPS
 ```
 
 ## Licencia
