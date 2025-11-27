@@ -1,7 +1,7 @@
 services:
   postgres:
     image: postgres:16-alpine
-    container_name: n8n-postgres
+    container_name: n8n-vps-postgres
     environment:
       - POSTGRES_DB=${DB_POSTGRESDB_DATABASE}
       - POSTGRES_USER=${DB_POSTGRESDB_USER}
@@ -15,7 +15,7 @@ services:
 
   n8n:
     image: docker.n8n.io/n8nio/n8n:latest
-    container_name: n8n
+    container_name: n8n-vps-app
     depends_on:
       - postgres
     expose:
@@ -47,7 +47,7 @@ services:
 
   nginx:
     image: nginx:1.25-alpine
-    container_name: n8n-nginx
+    container_name: n8n-vps-nginx
     depends_on:
       - n8n
     ports:
@@ -65,7 +65,7 @@ services:
 
   certbot:
     image: certbot/certbot:latest
-    container_name: n8n-certbot
+    container_name: n8n-vps-certbot
     depends_on:
       - nginx
     volumes:
