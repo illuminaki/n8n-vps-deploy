@@ -1,0 +1,40 @@
+# Environment variables
+.env
+.env.local
+.env.*.local
+
+# Docker volumes and data
+n8n_data/
+pg_data/
+
+# Logs
+*.log
+logs/
+
+# OS files
+.DS_Store
+Thumbs.db
+
+# IDE
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+
+# Backup files
+*.bak
+*.backup
+backup/
+
+# SSL certificates (if stored locally)
+*.pem
+*.key
+*.crt
+ssl/
+certs/
+
+# Temporary files
+tmp/
+temp/
+*.tmp
